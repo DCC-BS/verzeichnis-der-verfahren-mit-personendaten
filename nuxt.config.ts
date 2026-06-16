@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
   runtimeConfig: {
-    bsApiKey: process.env.BS_API_KEY || '',
+    bsApiKey: process.env.NUXT_PUBLIC_BS_API_KEY || '',
   },
 
   app: {
