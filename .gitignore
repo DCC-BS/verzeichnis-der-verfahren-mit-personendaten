@@ -4,3 +4,4 @@ node_modules
 dist
 .env
 *.log
+100520.json
