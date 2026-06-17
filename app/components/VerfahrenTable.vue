@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import type { Verfahren } from '~/types/verfahren'
+import type { Verfahren } from "~/types/verfahren";
 
 const props = defineProps<{
-  verfahren: Verfahren
-}>()
+  verfahren: Verfahren;
+}>();
 
 const columns = [
-  { key: 'label', label: '', thClass: 'sr-only', tdClass: 'w-1/4' },
-  { key: 'value', label: '', thClass: 'sr-only' },
-]
+  { key: "label", label: "", thClass: "sr-only", tdClass: "w-1/4" },
+  { key: "value", label: "", thClass: "sr-only" },
+];
 
 const rows = computed(() => [
-  { label: 'Bezeichnung', value: props.verfahren.bezeichnung },
-  { label: 'Rechtsgrundlage(n)', value: props.verfahren.rechtsgrundlage_n },
-  { label: 'Quelle(n)', value: props.verfahren.quelle_n },
-  { label: 'Verantwortliche Stelle', value: props.verfahren.verantwortliche_stelle },
-  { label: 'Internetauftritt', value: props.verfahren.internetauftritt },
-  { label: 'Zweck der Datenbearbeitung', value: props.verfahren.zweck_der_datenbearbeitung },
-])
+  { label: "Bezeichnung", value: props.verfahren.bezeichnung },
+  { label: "Rechtsgrundlage(n)", value: props.verfahren.rechtsgrundlage_n },
+  { label: "Quelle(n)", value: props.verfahren.quelle_n },
+  { label: "Verantwortliche Stelle", value: props.verfahren.verantwortliche_stelle },
+  { label: "Internetauftritt", value: props.verfahren.internetauftritt },
+  { label: "Zweck der Datenbearbeitung", value: props.verfahren.zweck_der_datenbearbeitung },
+]);
 </script>
 
 <template>
