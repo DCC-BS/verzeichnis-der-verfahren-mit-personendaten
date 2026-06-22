@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import IconSymbolSearch from "@kanton-basel-stadt/designsystem/icons/symbol/search";
+
 const query = defineModel<string>("query", { default: "" });
 const department = defineModel<string>("department", { default: "" });
 const abteilung = defineModel<string>("abteilung", { default: "" });
@@ -23,7 +25,11 @@ function submit() {
   <div class="full-bleed">
     <div class="search-band" style="background-color: #ddecde">
       <div class="container py-20 lg:py-30">
-        <form class="search-pill" role="search" @submit.prevent="submit">
+        <form
+          class="search-pill border border-blue-900 transition-all ease-in-out duration-150 hover:border-purple-600 focus-within:!border-purple-500 focus-within:!shadow-purple-600"
+          role="search"
+          @submit.prevent="submit"
+        >
           <input
             v-model="draft"
             type="search"
@@ -32,6 +38,7 @@ function submit() {
             aria-label="Frage oder Suchbegriff"
           />
           <button type="submit" class="button is-strong search-submit">
+            <component :is="IconSymbolSearch" aria-hidden="true" />
             Suchen
           </button>
         </form>
@@ -53,7 +60,7 @@ function submit() {
               id="filter-abteilung"
               v-model="abteilung"
               class="input"
-              :disabled="abteilungOptions.length === 0"
+              :disabled="!department"
             >
               <option value="">Alle Abteilungen</option>
               <option v-for="abt in abteilungOptions" :key="abt" :value="abt">
@@ -87,7 +94,6 @@ function submit() {
   gap: 8px;
   width: 100%;
   background: #fff;
-  border: 1px solid rgb(var(--color-blue-900, 12 38 84));
   border-radius: 9999px;
   padding: 6px 6px 6px 20px;
 }

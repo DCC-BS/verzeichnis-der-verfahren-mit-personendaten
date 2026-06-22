@@ -1,8 +1,10 @@
+import { joinURL } from "ufo";
 import type { Verfahren } from "~/types/verfahren";
 import { getDepartmentOrder } from "~/utils/departmentMeta";
 
 export function useVerfahren() {
-  const { data: rawData, status } = useFetch<Verfahren[]>("/api/verfahren");
+  const base = useRuntimeConfig().app.baseURL;
+  const { data: rawData, status } = useFetch<Verfahren[]>(() => joinURL(base, "api/verfahren"));
 
   const order = getDepartmentOrder();
   const departmentRank = (name: string) => {

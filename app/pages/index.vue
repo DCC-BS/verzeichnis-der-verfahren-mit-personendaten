@@ -1,34 +1,33 @@
 <script setup lang="ts">
-import { slugify } from "~/utils/slugify";
-
-const PAGE_SIZE = 25;
+import type { Verfahren } from "~/types/verfahren";
 
 const { verfahren, status, departmentOptions, abteilungenFor } = useVerfahren();
 const { query, department, abteilung, filtered } = useVerfahrenFilter(verfahren);
 
 const abteilungOptions = computed(() => abteilungenFor(department.value || null));
 
-const page = ref(1);
-watch(filtered, () => {
-  page.value = 1;
-});
+const hasQuery = computed(() => query.value.trim().length > 0);
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / PAGE_SIZE)));
-const pagedVerfahren = computed(() => {
-  const start = (page.value - 1) * PAGE_SIZE;
-  return filtered.value.slice(start, start + PAGE_SIZE);
-});
+interface VerfahrenGroup {
+  label: string;
+  items: Verfahren[];
+}
 
-function goToPage(next: number) {
-  page.value = Math.min(Math.max(1, next), totalPages.value);
-  if (import.meta.client) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+const groups = computed<VerfahrenGroup[]>(() => {
+  const result: VerfahrenGroup[] = [];
+  let current: VerfahrenGroup | null = null;
+
+  for (const v of filtered.value) {
+    const label = [v.department, v.abteilung].filter(Boolean).join(" · ");
+    if (!current || current.label !== label) {
+      current = { label, items: [] };
+      result.push(current);
+    }
+    current.items.push(v);
   }
-}
 
-function subtitle(v: (typeof filtered.value)[number]) {
-  return [v.department, v.abteilung].filter(Boolean).join(" · ");
-}
+  return result;
+});
 </script>
 
 <template>
@@ -66,36 +65,17 @@ function subtitle(v: (typeof filtered.value)[number]) {
 
       <template v-else>
         <section
-          v-for="v in pagedVerfahren"
-          :key="`${v.department}-${v.abteilung}-${v.bezeichnung}`"
-          class="verfahren-section"
+          v-for="group in groups"
+          :key="group.label"
+          class="verfahren-group"
         >
-          <h2 :id="slugify(v.bezeichnung)" class="verfahren-heading scroll-mt-10">
-            {{ v.bezeichnung }}
+          <h2
+            class="pre-heading text-primary-700 sticky top-0 z-40 -mt-15 mb-15 py-15 backdrop-blur-md bg-white/80 transition-all duration-250 ease-in-out mobile-only:-mx-15 mobile-only:px-15"
+          >
+            {{ group.label }}
           </h2>
-          <p class="verfahren-subtitle">{{ subtitle(v) }}</p>
-          <VerfahrenTable :verfahren="v" />
+          <VerfahrenAccordion :items="group.items" :open-all="hasQuery" />
         </section>
-
-        <nav v-if="totalPages > 1" class="pagination" aria-label="Seitennavigation">
-          <button
-            type="button"
-            class="button is-prev is-inverted"
-            :disabled="page === 1"
-            @click="goToPage(page - 1)"
-          >
-            Zurück
-          </button>
-          <span class="pagination-info">Seite {{ page }} von {{ totalPages }}</span>
-          <button
-            type="button"
-            class="button is-next is-inverted"
-            :disabled="page === totalPages"
-            @click="goToPage(page + 1)"
-          >
-            Weiter
-          </button>
-        </nav>
       </template>
     </template>
   </div>
@@ -108,39 +88,7 @@ function subtitle(v: (typeof filtered.value)[number]) {
   font-size: 1.125rem;
 }
 
-.verfahren-heading {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.verfahren-subtitle {
-  color: rgb(var(--color-gray-600, 82 82 82));
-  font-size: 0.875rem;
-  margin-bottom: 10px;
-}
-
-.verfahren-section {
+.verfahren-group {
   margin-top: 30px;
-  margin-bottom: 30px;
-}
-
-@media (min-width: 1024px) {
-  .verfahren-section {
-    margin-top: 50px;
-    margin-bottom: 50px;
-  }
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 40px;
-}
-
-.pagination-info {
-  font-weight: 500;
 }
 </style>

@@ -7,6 +7,16 @@ const DATASET_ID = "100520";
 
 let cachedData: unknown[] | null = null;
 
+function toLines(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 function normalizeRow(row: unknown): unknown {
   if (!row || typeof row !== "object") {
     return row;
@@ -20,6 +30,8 @@ function normalizeRow(row: unknown): unknown {
     ...record,
     department,
     verantwortliche_stelle: verantwortlicheStelle,
+    rechtsgrundlage_n: toLines(record.rechtsgrundlage_n),
+    quelle_n: toLines(record.quelle_n),
   };
 }
 
