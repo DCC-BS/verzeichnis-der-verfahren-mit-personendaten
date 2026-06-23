@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
 
   runtimeConfig: {
-    bsApiKey: process.env.NUXT_PUBLIC_BS_API_KEY || "",
+    bsApiKey: process.env.NUXT_BS_API_KEY || "",
     feedback: {
       repo: "Feedback_verzeichnis-der-verfahren-mit-personendaten",
       repoOwner: "DCC-BS",
