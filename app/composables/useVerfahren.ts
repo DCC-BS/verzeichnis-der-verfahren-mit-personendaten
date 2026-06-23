@@ -1,58 +1,47 @@
-import type { AbteilungGroup, DepartmentGroup, Verfahren } from '~/types/verfahren'
-import { slugify } from '~/utils/slugify'
-import { getDepartmentOrder } from '~/utils/departmentMeta'
+import { joinURL } from "ufo";
+import type { Verfahren } from "~/types/verfahren";
+import { getDepartmentOrder } from "~/utils/departmentMeta";
 
 export function useVerfahren() {
-  const { data: rawData, status } = useFetch<Verfahren[]>('/api/verfahren')
+  const base = useRuntimeConfig().app.baseURL;
+  const { data: rawData, status } = useFetch<Verfahren[]>(() => joinURL(base, "api/verfahren"));
 
-  const departments = computed<DepartmentGroup[]>(() => {
-    if (!rawData.value) return []
+  const order = getDepartmentOrder();
+  const departmentRank = (name: string) => {
+    const index = order.indexOf(name);
+    return index === -1 ? order.length : index;
+  };
 
-    const order = getDepartmentOrder()
-    const grouped = new Map<string, Map<string | null, Verfahren[]>>()
+  const verfahren = computed<Verfahren[]>(() => {
+    if (!rawData.value) return [];
 
-    for (const v of rawData.value) {
-      if (!grouped.has(v.department)) {
-        grouped.set(v.department, new Map())
-      }
-      const deptMap = grouped.get(v.department)!
-      const key = v.abteilung
-      if (!deptMap.has(key)) {
-        deptMap.set(key, [])
-      }
-      deptMap.get(key)!.push(v)
+    return [...rawData.value].sort((a, b) => {
+      const deptDiff = departmentRank(a.department) - departmentRank(b.department);
+      if (deptDiff !== 0) return deptDiff;
+
+      const abtDiff = (a.abteilung ?? "").localeCompare(b.abteilung ?? "", "de");
+      if (abtDiff !== 0) return abtDiff;
+
+      return a.bezeichnung.localeCompare(b.bezeichnung, "de");
+    });
+  });
+
+  const departmentOptions = computed<string[]>(() => {
+    const seen = new Set<string>();
+    for (const v of verfahren.value) {
+      if (v.department) seen.add(v.department);
     }
+    return [...seen].sort((a, b) => departmentRank(a) - departmentRank(b));
+  });
 
-    const result: DepartmentGroup[] = []
-    for (const deptName of order) {
-      const abtMap = grouped.get(deptName)
-      if (!abtMap) continue
-
-      const abteilungen: AbteilungGroup[] = []
-      for (const [abtName, verfahren] of abtMap) {
-        abteilungen.push({
-          name: abtName,
-          slug: slugify(abtName ?? deptName),
-          verfahren,
-        })
-      }
-
-      result.push({ name: deptName, abteilungen })
+  function abteilungenFor(department: string | null): string[] {
+    const seen = new Set<string>();
+    for (const v of verfahren.value) {
+      if (department && v.department !== department) continue;
+      if (v.abteilung) seen.add(v.abteilung);
     }
-
-    return result
-  })
-
-  function findBySlug(slug: string): { department: string; abteilung: AbteilungGroup } | null {
-    for (const dept of departments.value) {
-      for (const abt of dept.abteilungen) {
-        if (abt.slug === slug) {
-          return { department: dept.name, abteilung: abt }
-        }
-      }
-    }
-    return null
+    return [...seen].sort((a, b) => a.localeCompare(b, "de"));
   }
 
-  return { departments, status, findBySlug }
+  return { verfahren, status, departmentOptions, abteilungenFor };
 }

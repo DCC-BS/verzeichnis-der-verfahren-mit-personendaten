@@ -12,6 +12,7 @@ COPY nuxt.config.ts ./
 COPY tsconfig.json ./
 COPY app ./app
 COPY server ./server
+COPY public ./public
 
 RUN bun install --ci
 RUN bun x nuxi prepare
