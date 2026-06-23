@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     bsApiKey: process.env.NUXT_PUBLIC_BS_API_KEY || "",
     feedback: {
       repo: "Feedback_verzeichnis-der-verfahren-mit-personendaten",
-      repoOwner: "opendatabs",
+      repoOwner: "DCC-BS",
       project: "verzeichnis-der-verfahren-mit-personendaten",
       githubToken: process.env.FEEDBACK_GITHUB_TOKEN || "",
       label: "feedback",

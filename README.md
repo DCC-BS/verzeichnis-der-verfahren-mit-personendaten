@@ -39,6 +39,6 @@ Then open [http://localhost:8032](http://localhost:8032).
 
 The workflow in `.github/workflows/docker.yml` builds and pushes the Docker image to GitHub Container Registry (`ghcr.io`):
 
-- Image: `ghcr.io/DCC-BS/verzeichnis-der-verfahren-mit-personendaten`
+- Image: `ghcr.io/dcc-bs/verzeichnis-der-verfahren-mit-personendaten`
 - Tags: commit SHA and `latest` on the default branch
 - Runs on pushes to `main`/`master`, on tags, and via manual dispatch
