@@ -6,15 +6,10 @@ RUN npm install -g bun
 WORKDIR /app
 ENV NODE_OPTIONS=--max-old-space-size=8192
 
-COPY package.json ./
-COPY bun.lock ./
-COPY nuxt.config.ts ./
-COPY tsconfig.json ./
-COPY app ./app
-COPY server ./server
-COPY public ./public
-
+COPY package.json bun.lock ./
 RUN bun install --ci
+
+COPY . .
 RUN bun x nuxi prepare
 RUN bun x nuxi build
 

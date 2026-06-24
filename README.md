@@ -2,43 +2,60 @@
 
 Nuxt application for the Verzeichnis der Verfahren mit Personendaten.
 
-## Option 1: Run directly (local dev)
+## Prerequisites
+
+- [Bun](https://bun.sh/) `1.2.20` (see the `packageManager` field in `package.json`)
+- Node.js `24` (only required for Docker; the runtime image uses it)
+
+## Environment variables
+
+Copy the example file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description |
+| --- | --- |
+| `NUXT_PUBLIC_BS_API_KEY` | API key for the data.bs.ch open data portal |
+| `NUXT_FEEDBACK_GITHUB_TOKEN` | GitHub token used by the feedback feature |
+
+## Running without Docker
+
+Install dependencies and start the dev server with hot reload:
 
 ```bash
 bun install
 bun run dev
 ```
 
-## Option 2: Run locally with Docker
+The app is available at <http://localhost:3000>.
+
+To build and run a production preview locally:
+
+```bash
+bun run build
+bun run preview
+```
+
+## Running with Docker
+
+The `Dockerfile` builds the app and serves it with the Nitro production server on
+port `8030`.
 
 Build the image:
 
 ```bash
-docker build -t verzeichnis-der-verfahren-mit-personendaten:local .
+docker build -t verzeichnis-der-verfahren-mit-personendaten .
 ```
 
-Run the container (pass the API key at runtime):
+Run the container, passing your environment variables and mapping the port:
 
 ```bash
-docker run --rm -p 8032:8032 \
-  -e NUXT_BS_API_KEY="your-api-key" \
-  verzeichnis-der-verfahren-mit-personendaten:local
+docker run --rm -p 8032:8032 --env-file .env verzeichnis-der-verfahren-mit-personendaten
 ```
 
-Or load it from your local `.env` file:
+The app is then available at <http://localhost:8032>.
 
-```bash
-docker run --rm -p 8032:8032 \
-  -e NUXT_BS_API_KEY="$(grep NUXT_PUBLIC_BS_API_KEY .env | cut -d= -f2-)" \
-  verzeichnis-der-verfahren-mit-personendaten:local
-```
-
-Then open [http://localhost:8032](http://localhost:8032).
-
-## GitHub Container Registry workflow
-
-The workflow in `.github/workflows/docker.yml` builds and pushes the Docker image to GitHub Container Registry (`ghcr.io`):
-
-- Image: `ghcr.io/dcc-bs/verzeichnis-der-verfahren-mit-personendaten`
-- Tags: commit SHA and `latest` on the default branch
-- Runs on pushes to `main`/`master`, on tags, and via manual dispatch
+> The same image is built and pushed to GitHub Container Registry by the
+> `.github/workflows/docker.yml` workflow on pushes to `main` and on tags.
