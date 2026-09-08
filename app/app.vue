@@ -4,9 +4,7 @@ import { withBase } from "ufo";
 const baseURL = useRuntimeConfig().app.baseURL;
 
 useHead({
-  link: [
-    { rel: "icon", type: "image/png", href: withBase("/icons/favicon.png", baseURL) },
-  ],
+  link: [{ rel: "icon", type: "image/png", href: withBase("/icons/favicon.png", baseURL) }],
 });
 </script>
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import IconSymbolClose from "@kanton-basel-stadt/designsystem/icons/symbol/close";
 import IconSymbolSearch from "@kanton-basel-stadt/designsystem/icons/symbol/search";
 
 const query = defineModel<string>("query", { default: "" });
@@ -19,6 +20,11 @@ watch(query, (value) => {
 function submit() {
   query.value = draft.value;
 }
+
+function clearSearch() {
+  draft.value = "";
+  query.value = "";
+}
 </script>
 
 <template>
@@ -37,6 +43,15 @@ function submit() {
             placeholder="Frage oder Suchbegriff"
             aria-label="Frage oder Suchbegriff"
           />
+          <button
+            v-if="draft"
+            type="button"
+            class="search-clear"
+            aria-label="Suche zurücksetzen"
+            @click="clearSearch"
+          >
+            <component :is="IconSymbolClose" aria-hidden="true" />
+          </button>
           <button type="submit" class="button is-strong search-submit">
             <component :is="IconSymbolSearch" aria-hidden="true" />
             Suchen
@@ -44,30 +59,21 @@ function submit() {
         </form>
 
         <div class="filter-grid mt-20">
-          <div class="filter-field">
-            <label for="filter-department" class="label">Departement</label>
-            <select id="filter-department" v-model="department" class="input">
-              <option value="">Alle Departemente</option>
-              <option v-for="dep in departmentOptions" :key="dep" :value="dep">
-                {{ dep }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-field">
-            <label for="filter-abteilung" class="label">Abteilung</label>
-            <select
-              id="filter-abteilung"
-              v-model="abteilung"
-              class="input"
-              :disabled="!department"
-            >
-              <option value="">Alle Abteilungen</option>
-              <option v-for="abt in abteilungOptions" :key="abt" :value="abt">
-                {{ abt }}
-              </option>
-            </select>
-          </div>
+          <Dropdown
+            id="filter-department"
+            v-model="department"
+            label="Departement"
+            placeholder="Alle Departemente"
+            :options="departmentOptions"
+          />
+          <Dropdown
+            id="filter-abteilung"
+            v-model="abteilung"
+            label="Abteilung"
+            placeholder="Alle Abteilungen"
+            :options="abteilungOptions"
+            :disabled="!department"
+          />
         </div>
       </div>
     </div>
@@ -113,6 +119,32 @@ function submit() {
   color: rgb(var(--color-gray-500, 115 115 115));
 }
 
+.search-input::-webkit-search-cancel-button {
+  appearance: none;
+  display: none;
+}
+
+.search-clear {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgb(30 69 87);
+  cursor: pointer;
+}
+
+.search-clear svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
 .search-submit {
   flex: 0 0 auto;
   border-radius: 9999px !important;
@@ -122,15 +154,6 @@ function submit() {
   display: grid;
   gap: 16px;
   grid-template-columns: 1fr;
-}
-
-.filter-field {
-  display: flex;
-  flex-direction: column;
-}
-
-.filter-field .input {
-  width: 100%;
 }
 
 @media (min-width: 768px) {

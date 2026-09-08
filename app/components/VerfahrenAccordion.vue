@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import type { Verfahren } from '~/types/verfahren'
+import type { Verfahren } from "~/types/verfahren";
 
-const props = defineProps<{
-  items: Verfahren[]
-  openAll?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    items: Verfahren[];
+    openAll?: boolean;
+    idPrefix?: string;
+  }>(),
+  {
+    openAll: false,
+    idPrefix: "verfahren",
+  },
+);
 
 const accordionItems = computed(() =>
-  props.items.map(item => ({
+  props.items.map((item) => ({
     ...item,
     title: item.bezeichnung,
   })),
-)
+);
 
 function asVerfahren(item: Record<string, unknown>): Verfahren {
-  return item as unknown as Verfahren
+  return item as unknown as Verfahren;
 }
 </script>
 
@@ -22,7 +29,7 @@ function asVerfahren(item: Record<string, unknown>): Verfahren {
   <Accordion
     :items="accordionItems"
     :open-all="openAll"
-    id-prefix="verfahren"
+    :id-prefix="idPrefix"
   >
     <template #item="{ item }">
       <VerfahrenTable :verfahren="asVerfahren(item)" />
