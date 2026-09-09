@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineNuxtConfig({
-  extends: [join(__dirname, "../bs-dashboard-base")],
+  extends: [join(__dirname, "node_modules/bs-dashboard-base")],
 
   compatibilityDate: "2025-01-01",
 
