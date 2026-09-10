@@ -98,6 +98,10 @@ function isAbtSelected(deptName: string, abtName: string | null) {
 function crumbClass(selected: boolean) {
   return selected ? "text-green-700" : "text-green-500";
 }
+
+function hasNamedAbteilung(dept: DepartmentGroup) {
+  return dept.abteilungen.some((abt) => Boolean(abt.name));
+}
 </script>
 
 <template>
@@ -108,7 +112,7 @@ function crumbClass(selected: boolean) {
     <p class="lead mt-30 hyphens-auto lg:hyphens-none text-pretty">
       Die öffentlichen Organe sind verpflichtet, über Angelegenheiten von allgemeinem Interesse
       aktiv zu informieren. Das folgende Verzeichnis listet die Verfahren der kantonalen Verwaltung
-      Basel-Stadt auf, bei denen personenbezogene Daten bearbeitet werden.
+      Basel-Stadt nach Organisationen auf.
     </p>
 
     <SearchFilterBar
@@ -126,7 +130,7 @@ function crumbClass(selected: boolean) {
 
     <template v-else>
       <p class="result-count">
-        <strong>{{ filtered.length }}</strong> Verfahren
+        <strong>{{ filtered.length }} Verfahren</strong>
       </p>
 
       <div v-if="filtered.length === 0" class="text-gray-600">
@@ -142,6 +146,7 @@ function crumbClass(selected: boolean) {
           <h2
             v-dept-height
             class="dept-heading"
+            :class="{ 'dept-heading--solo': !hasNamedAbteilung(dept) }"
           >
             <button
               type="button"
@@ -229,6 +234,10 @@ function crumbClass(selected: boolean) {
   top: 0;
   z-index: 42;
   padding: 12px 0 2px;
+}
+
+.dept-heading--solo {
+  margin-bottom: 16px;
 }
 
 .abt-heading {
