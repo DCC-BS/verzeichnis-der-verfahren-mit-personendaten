@@ -7,6 +7,7 @@ export interface Verfahren {
   verantwortliche_stelle: string;
   internetauftritt: string;
   zweck_der_datenbearbeitung: string;
+  stand: string;
   source_url: string;
   path: string;
 }

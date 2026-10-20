@@ -5,6 +5,11 @@ const props = defineProps<{
   verfahren: Verfahren;
 }>();
 
+function formatStand(stand: string): string {
+  const [year, month, day] = stand.split("-");
+  return `${day}.${month}.${year}`;
+}
+
 const columns = [
   { key: "label", label: "", thClass: "sr-only", tdClass: "w-1/4" },
   { key: "value", label: "", thClass: "sr-only" },
@@ -16,6 +21,7 @@ const rows = computed(() => [
   { label: "Verantwortliches öffentliches Organ", value: props.verfahren.verantwortliche_stelle },
   { label: "Internetauftritt", value: props.verfahren.internetauftritt },
   { label: "Zweck der Datenbearbeitung", value: props.verfahren.zweck_der_datenbearbeitung },
+  { label: "Stand", value: formatStand(props.verfahren.stand) },
 ]);
 </script>
 
