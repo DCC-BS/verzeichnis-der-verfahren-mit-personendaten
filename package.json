@@ -4,6 +4,7 @@
   "private": true,
   "description": "Verzeichnis der Verfahren mit Personendaten – Kanton Basel-Stadt",
   "type": "module",
+  "packageManager": "bun@1.4.4",
   "scripts": {
     "dev": "nuxi dev",
     "build": "nuxt build",
