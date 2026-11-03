@@ -5,3 +5,4 @@ dist
 .env
 *.log
 100520.json
+.idea/
