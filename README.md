@@ -4,8 +4,8 @@ Nuxt application for the Verzeichnis der Verfahren mit Personendaten.
 
 ## Prerequisites
 
-- [Bun](https://bun.sh/) `1.2.20` (see the `packageManager` field in `package.json`)
-- Node.js `24` (only required for Docker; the runtime image uses it)
+- [Bun](https://bun.sh/) `1.4.4` (see the `packageManager` field in `package.json`)
+- Node.js `24.22.2` (only required for Docker; the runtime image uses it)
 
 ## Environment variables
 
