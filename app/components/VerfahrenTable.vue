@@ -16,11 +16,11 @@ const columns = [
 ];
 
 const rows = computed(() => [
+  { label: "Zweck der Datenbearbeitung", value: props.verfahren.zweck_der_datenbearbeitung },
   { label: "Rechtsgrundlage(n)", value: props.verfahren.rechtsgrundlage_n },
   { label: "Quelle(n)", value: props.verfahren.quelle_n },
   { label: "Verantwortliches öffentliches Organ", value: props.verfahren.verantwortliche_stelle },
   { label: "Internetauftritt", value: props.verfahren.internetauftritt },
-  { label: "Zweck der Datenbearbeitung", value: props.verfahren.zweck_der_datenbearbeitung },
   { label: "Stand", value: formatStand(props.verfahren.stand) },
 ]);
 </script>
