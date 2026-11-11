@@ -4,8 +4,6 @@ import { createError, useRuntimeConfig } from '#imports'
 
 const DATASET_ID = '100520'
 
-let cachedData: unknown[] | null = null
-
 function toLines(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value.map(item => String(item).trim()).filter(Boolean)
@@ -45,16 +43,15 @@ export default defineEventHandler(async () => {
     })
   }
 
-  if (!cachedData) {
-    try {
-      cachedData = await fetchDatasetJson(DATASET_ID, key)
-    }
-    catch {
-      const filePath = join(process.cwd(), '100520.json')
-      const raw = await readFile(filePath, 'utf-8')
-      cachedData = JSON.parse(raw)
-    }
+  let data: unknown[]
+  try {
+    data = await fetchDatasetJson(DATASET_ID, key)
+  }
+  catch {
+    const filePath = join(process.cwd(), '100520.json')
+    const raw = await readFile(filePath, 'utf-8')
+    data = JSON.parse(raw)
   }
 
-  return cachedData.map(normalizeRow)
+  return data.map(normalizeRow)
 })
