@@ -10,6 +10,18 @@ function formatStand(stand: string): string {
   return `${day}.${month}.${year}`;
 }
 
+function splitUrlAndSuffix(value: string): { url: string; suffix: string } {
+  const trimmed = value.trim();
+  const spaceIndex = trimmed.indexOf(" ");
+  if (spaceIndex === -1) {
+    return { url: trimmed, suffix: "" };
+  }
+  return {
+    url: trimmed.slice(0, spaceIndex),
+    suffix: trimmed.slice(spaceIndex + 1),
+  };
+}
+
 const columns = [
   { key: "label", label: "", thClass: "sr-only", tdClass: "w-1/4" },
   { key: "value", label: "", thClass: "sr-only" },
@@ -37,15 +49,16 @@ const rows = computed(() => [
         </template>
         <template v-else-if="row.label === 'Quelle(n)'">
           <ul class="source-list">
-            <li v-for="(q, i) in row.value" :key="i">
+            <li v-for="(parsed, i) in row.value.map(splitUrlAndSuffix)" :key="i">
               <a
-                :href="q"
+                :href="parsed.url"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="link source-link"
               >
-                {{ q.replace(/^https?:\/\//, '') }}
+                {{ parsed.url.replace(/^https?:\/\//, '') }}
               </a>
+              <template v-if="parsed.suffix">{{ " " + parsed.suffix }}</template>
             </li>
           </ul>
         </template>
@@ -83,7 +96,6 @@ const rows = computed(() => [
 }
 
 .source-link {
-  display: block;
   text-decoration: underline;
 }
 
