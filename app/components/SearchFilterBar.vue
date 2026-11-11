@@ -40,8 +40,8 @@ function clearSearch() {
             v-model="draft"
             type="search"
             class="search-input"
-            placeholder="Frage oder Suchbegriff"
-            aria-label="Frage oder Suchbegriff"
+            placeholder="Suchbegriff"
+            aria-label="Suchbegriff"
           />
           <button
             v-if="draft"
