@@ -211,6 +211,23 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
   font-size: 1.125rem;
 }
 
+.verfahren-list {
+  isolation: isolate;
+}
+
+.verfahren-list :deep(.accordion-item) {
+  position: relative;
+  /* keep whole card (incl. chrome) under sticky dept/abt headers */
+  z-index: -1;
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(55, 65, 81, 0.2);
+  transition: box-shadow 0.25s ease;
+}
+
+.verfahren-list :deep(.accordion-item:hover) {
+  box-shadow: inset 0 0 0 1px rgba(55, 65, 81, 0.6);
+}
+
 .dept-block {
   --dept-h: 3.25rem;
   margin-top: 40px;
