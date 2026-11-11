@@ -8,6 +8,8 @@ export default defineNuxtConfig({
 
   compatibilityDate: "2025-01-01",
 
+  css: ["~/assets/css/header.css"],
+
   runtimeConfig: {
     bsApiKey: process.env.NUXT_BS_API_KEY || "",
     feedback: {
