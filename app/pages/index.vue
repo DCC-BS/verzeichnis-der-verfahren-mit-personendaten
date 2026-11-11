@@ -46,22 +46,6 @@ const deptGroups = computed<DepartmentGroup[]>(() => {
   return result;
 });
 
-const vDeptHeight = {
-  mounted(el: HTMLElement) {
-    const parent = el.closest(".dept-block") as HTMLElement | null;
-    const apply = () => {
-      parent?.style.setProperty("--dept-h", `${el.offsetHeight}px`);
-    };
-    apply();
-    const observer = new ResizeObserver(apply);
-    observer.observe(el);
-    (el as HTMLElement & { _deptHeightObserver?: ResizeObserver })._deptHeightObserver = observer;
-  },
-  unmounted(el: HTMLElement & { _deptHeightObserver?: ResizeObserver }) {
-    el._deptHeightObserver?.disconnect();
-  },
-};
-
 function selectDepartment(name: string) {
   if (department.value === name && !abteilung.value) {
     department.value = "";
@@ -144,7 +128,6 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
           class="dept-block"
         >
           <h2
-            v-dept-height
             class="dept-heading"
             :class="{ 'dept-heading--solo': !hasNamedAbteilung(dept) }"
           >
@@ -211,25 +194,7 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
   font-size: 1.125rem;
 }
 
-.verfahren-list {
-  isolation: isolate;
-}
-
-.verfahren-list :deep(.accordion-item) {
-  position: relative;
-  /* keep whole card (incl. chrome) under sticky dept/abt headers */
-  z-index: -1;
-  outline: none;
-  box-shadow: inset 0 0 0 1px rgba(55, 65, 81, 0.2);
-  transition: box-shadow 0.25s ease;
-}
-
-.verfahren-list :deep(.accordion-item:hover) {
-  box-shadow: inset 0 0 0 1px rgba(55, 65, 81, 0.6);
-}
-
 .dept-block {
-  --dept-h: 3.25rem;
   margin-top: 40px;
 }
 
@@ -243,13 +208,9 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.35;
-  background-color: #fff;
 }
 
 .dept-heading {
-  position: sticky;
-  top: 0;
-  z-index: 42;
   padding: 12px 0 2px;
 }
 
@@ -258,9 +219,6 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
 }
 
 .abt-heading {
-  position: sticky;
-  top: var(--dept-h);
-  z-index: 41;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -326,14 +284,6 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
 
   .dept-label-short {
     display: inline;
-  }
-
-  .dept-heading,
-  .abt-heading {
-    margin-left: -15px;
-    margin-right: -15px;
-    padding-left: 15px;
-    padding-right: 15px;
   }
 }
 
