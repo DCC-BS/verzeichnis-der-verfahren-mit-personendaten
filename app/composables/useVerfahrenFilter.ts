@@ -38,21 +38,9 @@ export function useVerfahrenFilter(verfahren: Ref<Verfahren[]>) {
   const department = ref<string>(typeof route.query.dep === "string" ? route.query.dep : "");
   const abteilung = ref<string>(typeof route.query.abt === "string" ? route.query.abt : "");
 
-  let suppressAbteilungReset = false;
-
   watch(department, () => {
-    if (suppressAbteilungReset) return;
     abteilung.value = "";
   });
-
-  function applyAbteilungFilter(deptName: string, abtName: string) {
-    suppressAbteilungReset = true;
-    department.value = deptName;
-    abteilung.value = abtName;
-    queueMicrotask(() => {
-      suppressAbteilungReset = false;
-    });
-  }
 
   watch([query, department, abteilung], ([q, dep, abt]) => {
     router.replace({
@@ -78,5 +66,5 @@ export function useVerfahrenFilter(verfahren: Ref<Verfahren[]>) {
     });
   });
 
-  return { query, department, abteilung, filtered, applyAbteilungFilter };
+  return { query, department, abteilung, filtered };
 }

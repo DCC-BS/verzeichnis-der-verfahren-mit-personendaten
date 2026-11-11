@@ -3,7 +3,7 @@ import IconSymbolCaret from "@kanton-basel-stadt/designsystem/icons/symbol/caret
 import type { Verfahren } from "~/types/verfahren";
 
 const { verfahren, status, departmentOptions, abteilungenFor } = useVerfahren();
-const { query, department, abteilung, filtered, applyAbteilungFilter } = useVerfahrenFilter(verfahren);
+const { query, department, abteilung, filtered } = useVerfahrenFilter(verfahren);
 
 const abteilungOptions = computed(() => abteilungenFor(department.value || null));
 
@@ -46,41 +46,8 @@ const deptGroups = computed<DepartmentGroup[]>(() => {
   return result;
 });
 
-function selectDepartment(name: string) {
-  if (department.value === name && !abteilung.value) {
-    department.value = "";
-    return;
-  }
-  if (department.value === name) {
-    abteilung.value = "";
-    return;
-  }
-  department.value = name;
-}
-
-function selectAbteilung(deptName: string, abtName: string | null) {
-  if (!abtName) return;
-  if (department.value === deptName && abteilung.value === abtName) {
-    abteilung.value = "";
-    return;
-  }
-  applyAbteilungFilter(deptName, abtName);
-}
-
 function accordionPrefix(deptName: string, abtName: string | null) {
   return `verfahren-${slugify(deptName)}-${slugify(abtName ?? "ohne")}`;
-}
-
-function isDeptSelected(deptName: string) {
-  return department.value === deptName && !abteilung.value;
-}
-
-function isAbtSelected(deptName: string, abtName: string | null) {
-  return Boolean(abtName) && department.value === deptName && abteilung.value === abtName;
-}
-
-function crumbClass(selected: boolean) {
-  return selected ? "text-green-700" : "text-green-500";
 }
 
 function hasNamedAbteilung(dept: DepartmentGroup) {
@@ -128,23 +95,11 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
           class="dept-block"
         >
           <h2
-            class="dept-heading"
+            class="dept-heading text-green-500"
             :class="{ 'dept-heading--solo': !hasNamedAbteilung(dept) }"
           >
-            <button
-              type="button"
-              class="breadcrumb-link"
-              :class="crumbClass(isDeptSelected(dept.name))"
-              :aria-current="isDeptSelected(dept.name) ? 'true' : undefined"
-              :aria-label="dept.name"
-              :title="isDeptSelected(dept.name)
-                ? `Filter «${dept.name}» aufheben`
-                : `Nach Departement «${dept.name}» filtern`"
-              @click="selectDepartment(dept.name)"
-            >
-              <span class="dept-label-full">{{ dept.name }}</span>
-              <span class="dept-label-short">{{ dept.abbreviation ?? dept.name }}</span>
-            </button>
+            <span class="dept-label-full">{{ dept.name }}</span>
+            <span class="dept-label-short">{{ dept.abbreviation ?? dept.name }}</span>
           </h2>
 
           <section
@@ -154,24 +109,13 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
           >
             <div
               v-if="abt.name"
-              class="abt-heading"
+              class="abt-heading text-green-500"
             >
-              <span class="breadcrumb-sep text-green-500" aria-hidden="true">
+              <span class="breadcrumb-sep" aria-hidden="true">
                 <component :is="IconSymbolCaret" class="breadcrumb-caret" />
                 <component :is="IconSymbolCaret" class="breadcrumb-caret breadcrumb-caret--nested" />
               </span>
-              <button
-                type="button"
-                class="breadcrumb-link"
-                :class="crumbClass(isAbtSelected(dept.name, abt.name))"
-                :aria-current="isAbtSelected(dept.name, abt.name) ? 'true' : undefined"
-                :title="isAbtSelected(dept.name, abt.name)
-                  ? `Filter «${abt.name}» aufheben`
-                  : `Nach Abteilung «${abt.name}» filtern`"
-                @click.stop="selectAbteilung(dept.name, abt.name)"
-              >
-                {{ abt.name }}
-              </button>
+              <span>{{ abt.name }}</span>
             </div>
             <VerfahrenAccordion
               :items="abt.items"
@@ -258,23 +202,6 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
 
 .breadcrumb-caret--nested {
   left: 0.34em;
-}
-
-.breadcrumb-link {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
-  text-decoration: none;
-}
-
-.breadcrumb-link:hover,
-.breadcrumb-link:focus-visible {
-  text-decoration: none;
-  opacity: 0.8;
 }
 
 @media (max-width: 767px) {
