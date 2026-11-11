@@ -14,3 +14,10 @@ useHead({
     <NuxtPage />
   </NuxtLayout>
 </template>
+
+<style>
+html,
+body {
+  background-color: #fff;
+}
+</style>

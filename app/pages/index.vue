@@ -53,6 +53,92 @@ function accordionPrefix(deptName: string, abtName: string | null) {
 function hasNamedAbteilung(dept: DepartmentGroup) {
   return dept.abteilungen.some((abt) => Boolean(abt.name));
 }
+
+const verfahrenListRef = ref<HTMLElement | null>(null);
+let stickyPushRaf = 0;
+
+function nextFollowingTop(header: HTMLElement, candidates: HTMLElement[]) {
+  for (const candidate of candidates) {
+    if (header.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING) {
+      return candidate.getBoundingClientRect().top;
+    }
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
+function applyStickyPush(
+  headers: HTMLElement[],
+  stickyTop: number,
+  extraPushers: HTMLElement[] = [],
+) {
+  for (const header of headers) {
+    header.style.transform = "none";
+  }
+
+  const heights = headers.map((header) => header.offsetHeight);
+  const sameLevelTops = headers.map((header) => header.getBoundingClientRect().top);
+
+  headers.forEach((header, index) => {
+    const nextSameTop = sameLevelTops[index + 1] ?? Number.POSITIVE_INFINITY;
+    const nextExtraTop = nextFollowingTop(header, extraPushers);
+    const nextTop = Math.min(nextSameTop, nextExtraTop);
+
+    if (!Number.isFinite(nextTop)) {
+      header.style.transform = "";
+      return;
+    }
+
+    const push = Math.min(0, nextTop - stickyTop - heights[index]!);
+    header.style.transform = push < 0 ? `translateY(${push}px)` : "";
+  });
+}
+
+function syncStickyPush() {
+  const list = verfahrenListRef.value;
+  if (!list) return;
+
+  const deptHeaders = [...list.querySelectorAll<HTMLElement>(".dept-heading")];
+  const abtHeaders = [...list.querySelectorAll<HTMLElement>(".abt-heading")];
+
+  applyStickyPush(deptHeaders, 0);
+
+  const abtStickyTop = abtHeaders[0]
+    ? Number.parseFloat(getComputedStyle(abtHeaders[0]).top)
+    : 0;
+  applyStickyPush(
+    abtHeaders,
+    Number.isFinite(abtStickyTop) ? abtStickyTop : 0,
+    deptHeaders,
+  );
+}
+
+function scheduleStickyPush() {
+  if (stickyPushRaf) return;
+  stickyPushRaf = window.requestAnimationFrame(() => {
+    stickyPushRaf = 0;
+    syncStickyPush();
+  });
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", scheduleStickyPush, { passive: true });
+  window.addEventListener("resize", scheduleStickyPush);
+  scheduleStickyPush();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", scheduleStickyPush);
+  window.removeEventListener("resize", scheduleStickyPush);
+  if (stickyPushRaf) {
+    window.cancelAnimationFrame(stickyPushRaf);
+    stickyPushRaf = 0;
+  }
+});
+
+watch(deptGroups, async () => {
+  await nextTick();
+  scheduleStickyPush();
+});
 </script>
 
 <template>
@@ -88,11 +174,14 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
         Keine Verfahren gefunden. Bitte passen Sie Ihre Suche oder die Filter an.
       </div>
 
-      <div v-else class="verfahren-list">
-        <section
+      <div
+        v-else
+        ref="verfahrenListRef"
+        class="verfahren-list"
+      >
+        <template
           v-for="dept in deptGroups"
           :key="dept.name"
-          class="dept-block"
         >
           <h2
             class="dept-heading text-green-500"
@@ -102,10 +191,9 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
             <span class="dept-label-short">{{ dept.abbreviation ?? dept.name }}</span>
           </h2>
 
-          <section
+          <template
             v-for="abt in dept.abteilungen"
             :key="abt.name ?? 'ohne'"
-            class="abt-block"
           >
             <div
               v-if="abt.name"
@@ -117,13 +205,15 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
               </span>
               <span>{{ abt.name }}</span>
             </div>
-            <VerfahrenAccordion
-              :items="abt.items"
-              :open-all="hasQuery"
-              :id-prefix="accordionPrefix(dept.name, abt.name)"
-            />
-          </section>
-        </section>
+            <div class="abt-block">
+              <VerfahrenAccordion
+                :items="abt.items"
+                :open-all="hasQuery"
+                :id-prefix="accordionPrefix(dept.name, abt.name)"
+              />
+            </div>
+          </template>
+        </template>
 
         <ScrollJumpButtons />
       </div>
@@ -138,39 +228,50 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
   font-size: 1.125rem;
 }
 
-.dept-block {
-  margin-top: 40px;
+.verfahren-list {
+  --dept-heading-height: calc(14px + 1.35 * 1.125rem);
 }
 
-.dept-block:first-child {
-  margin-top: 0;
+.abt-block + .dept-heading {
+  margin-top: 40px;
 }
 
 .dept-heading,
 .abt-heading {
-  margin: 0;
+  margin: 0 -12px;
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.35;
+  background-color: #fff;
+  box-shadow: -12px 0 0 #fff, 12px 0 0 #fff;
+  will-change: transform;
 }
 
 .dept-heading {
-  padding: 12px 0 2px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  padding: 12px 12px 2px;
 }
 
 .dept-heading--solo {
-  margin-bottom: 16px;
+  padding-bottom: 18px;
 }
 
 .abt-heading {
+  position: sticky;
+  top: calc(var(--dept-heading-height) - 2px);
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 2px 0 0;
-  margin-bottom: 16px;
+  padding: 4px 12px 4px;
+  margin-top: -2px;
+  margin-bottom: 12px;
+  box-shadow: -12px 0 0 #fff, 12px 0 0 #fff, 0 -2px 0 #fff;
 }
 
-.abt-block + .abt-block {
+.abt-block + .abt-heading {
   margin-top: 24px;
 }
 
@@ -215,6 +316,10 @@ function hasNamedAbteilung(dept: DepartmentGroup) {
 }
 
 @media (min-width: 768px) {
+  .verfahren-list {
+    --dept-heading-height: calc(14px + 1.35 * 1.25rem);
+  }
+
   .dept-heading,
   .abt-heading {
     font-size: 1.25rem;
