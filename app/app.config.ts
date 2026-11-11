@@ -8,7 +8,7 @@ export default defineAppConfig({
       contactLinks: [
         { href: "https://www.bs.ch/pd/statistik", label: "Statistisches Amt" },
         { href: "https://www.bs.ch/daten/databs/dcc", label: "DCC Data Competence Center" },
-        { href: "https://data.bs.ch/explore/dataset/100520/", label: "Link zur Datenquelle" },
+        { href: "https://data.bs.ch/explore/dataset/100520/", label: "Datenquelle" },
         {
           href: "https://github.com/DCC-BS/verzeichnis-der-verfahren-mit-personendaten",
           label: "Code auf Github",
