@@ -28,6 +28,7 @@ const columns = [
 ];
 
 const rows = computed(() => [
+  { label: "Bezeichnung", value: props.verfahren.bezeichnung },
   { label: "Zweck der Datenbearbeitung", value: props.verfahren.zweck_der_datenbearbeitung },
   { label: "Rechtsgrundlage(n)", value: props.verfahren.rechtsgrundlage_n },
   { label: "Quelle(n)", value: props.verfahren.quelle_n },
