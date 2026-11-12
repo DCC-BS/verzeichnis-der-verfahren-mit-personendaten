@@ -255,7 +255,7 @@ watch(deptGroups, async () => {
 }
 
 .dept-heading--solo {
-  padding-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .abt-heading {
